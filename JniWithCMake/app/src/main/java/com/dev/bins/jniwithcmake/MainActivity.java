@@ -19,7 +19,9 @@ public class MainActivity extends AppCompatActivity {
         // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
         tv.setText(stringFromJNI());
+        System.out.println(add(3,4));
     }
 
     public native String stringFromJNI();
+    public native int add(int x,int y);
 }
