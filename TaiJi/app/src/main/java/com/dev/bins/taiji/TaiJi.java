@@ -29,6 +29,7 @@ public class TaiJi extends View {
 
     public TaiJi(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        setBackgroundColor(Color.GRAY);
         blackPaint = new Paint();
         blackPaint.setStyle(Paint.Style.FILL);
         blackPaint.setColor(Color.BLACK);
@@ -63,7 +64,7 @@ public class TaiJi extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        canvas.rotate(degress += 10);
+        canvas.rotate(degress += 10,width/2,width/2);
         canvas.drawArc(rectF, 0, 180, false, whitePaint);
         canvas.drawArc(rectF, 180, 180, false, blackPaint);
 
