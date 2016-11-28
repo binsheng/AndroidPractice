@@ -4,10 +4,13 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,24 +47,40 @@ public class LocalCache {
         }
     }
 
-
-    public void saveBitmap(String url, Bitmap bitmap){
-        String key = MD5(url);
-        try {
-            DiskLruCache.Editor editor = mDiskLruCache.edit(key);
-            OutputStream outputStream = editor.newOutputStream(0);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public static LocalCache getInstance(Context context, String type) {
         if (instance == null) {
             instance = new LocalCache(context, type);
         }
         return instance;
+    }
+
+    public void saveBitmap(String url, InputStream in) {
+        String key = MD5(url);
+        try {
+            DiskLruCache.Editor editor = mDiskLruCache.edit(key);
+            OutputStream outputStream = editor.newOutputStream(0);
+            BufferedInputStream bufferedInputStream = new BufferedInputStream(in);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+            byte[] buffer = new byte[1024];
+            while (bufferedInputStream.read(buffer) != -1) {
+                bufferedOutputStream.write(buffer);
+            }
+            editor.commit();
+            mDiskLruCache.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Bitmap getBitmap(String url) {
+        try {
+            DiskLruCache.Snapshot snapshot = mDiskLruCache.get(MD5(url));
+            InputStream inputStream = snapshot.getInputStream(0);
+            return BitmapFactory.decodeStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private int getAppVersion(Context context) {
