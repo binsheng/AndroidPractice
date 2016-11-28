@@ -21,11 +21,11 @@ public class MemoryCache {
         };
     }
 
-    public Bitmap getBitmapFromMemory(String url){
+    public Bitmap getBitmap(String url){
         return mMemoryLruCache.get(url);
     }
 
-    public void saveBitmapToMemory(String url, Bitmap bitmap) {
+    public void saveBitmap(String url, Bitmap bitmap) {
         mMemoryLruCache.put(url, bitmap);
     }
 

@@ -3,14 +3,19 @@ package com.dev.bins.cachelib;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Environment;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
-import static com.jakewharton.disklrucache.DiskLruCache.open;
+import static android.R.attr.key;
 
 /**
  * Created by bin on 28/11/2016.
@@ -39,6 +44,19 @@ public class LocalCache {
         }
     }
 
+
+    public void saveBitmap(String url, Bitmap bitmap){
+        String key = MD5(url);
+        try {
+            DiskLruCache.Editor editor = mDiskLruCache.edit(key);
+            OutputStream outputStream = editor.newOutputStream(0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static LocalCache getInstance(Context context, String type) {
         if (instance == null) {
             instance = new LocalCache(context, type);
@@ -55,6 +73,29 @@ public class LocalCache {
             e.printStackTrace();
         }
         return 1;
+    }
+
+    public String MD5(String url) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(url.getBytes());
+            return bytesToHexString(digest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return String.valueOf(url.hashCode());
+        }
+    }
+
+    private String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
     }
 
 
