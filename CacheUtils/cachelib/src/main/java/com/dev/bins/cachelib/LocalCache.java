@@ -25,12 +25,11 @@ import static android.R.attr.key;
  */
 
 public class LocalCache {
-    private static LocalCache instance;
     private String cachePath;
     private long size = 10 * 1024 * 1024;
     private DiskLruCache mDiskLruCache;
 
-    private LocalCache(Context context, String type) {
+    LocalCache(Context context, String type) {
         if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || !Environment.isExternalStorageRemovable()) {
             cachePath = context.getExternalCacheDir().getPath() + File.separator;
         } else {
@@ -47,12 +46,6 @@ public class LocalCache {
         }
     }
 
-    public static LocalCache getInstance(Context context, String type) {
-        if (instance == null) {
-            instance = new LocalCache(context, type);
-        }
-        return instance;
-    }
 
     public void saveBitmap(String url, InputStream in) {
         String key = MD5(url);
