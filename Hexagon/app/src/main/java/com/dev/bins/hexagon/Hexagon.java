@@ -46,7 +46,7 @@ public class Hexagon extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         width = Math.min(w, h) - 2 * padding;
-        hexagonEdge = width / 2;
+        hexagonEdge = width / 2;//六边形的边长等于宽度的一半
         hexagonHeight = (int) (hexagonEdge * Math.sin(Math.PI / 180 * 60)) * 2;
     }
 

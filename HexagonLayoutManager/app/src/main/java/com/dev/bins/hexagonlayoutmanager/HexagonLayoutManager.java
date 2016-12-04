@@ -28,10 +28,10 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
     @Override
     public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
 //        rects.clear();
-        rectList.clear();
+//        rectList.clear();
         int itemCount = state.getItemCount();
         if (itemCount == 0) return;
-        detachAndScrapAttachedViews(recycler);
+        detachAndScrapAttachedViews(recycler);//解绑所有view
 
 //        initCenter(recycler);
 //        generateRects(itemCount);
@@ -43,9 +43,10 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
 //            layoutDecoratedWithMargins(view, rect.left, rect.top, rect.right, rect.bottom);
 //        }
         for (int i = 0; i < itemCount; i++) {
-            if (i >= rectList.size()) {
-                generateRectsOfFloor(getFloorOfPosition(i), recycler);
+            if (i >= rectList.size()) {//判断对应索引的位置有没有确定，没有确定则进行计算
+                generateRectsOfFloor(getFloorByPosition(i), recycler);
             }
+//            布局
             View view = recycler.getViewForPosition(i);
             measureChildWithMargins(view, 0, 0);
             addView(view);
@@ -56,11 +57,17 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
 
     }
 
+    /**
+     * 产生对应层的位置
+     * @param floor
+     * @param recycler
+     */
     private void generateRectsOfFloor(int floor, RecyclerView.Recycler recycler) {
         if (floor == 0) {
             initCenter(recycler);
             return;
         }
+//        第一层特殊处理
         if (floor == 1) {
             Rect zeroRect = rectList.get(0);
             for (int j = 0; j < 6; j++) {
@@ -77,10 +84,10 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
         for (int i = 0; i < count; i++) {
             Rect rect = rectList.get(startPosition + i);
             if ((i % (floor - 1)) == 0) {
-                getListRect(i, floor-1, rect);
+                getListRect(i, floor - 1, rect);
             } else {
-                int x = (int) (length * Math.cos((((i / (floor-1) + 1) % 6) * Math.PI / 3)));
-                int y = (int) (length * Math.sin((((i / (floor-1) + 1) % 6) * Math.PI / 3)));
+                int x = (int) (length * Math.cos((((i / (floor - 1) + 1) % 6) * Math.PI / 3)));
+                int y = (int) (length * Math.sin((((i / (floor - 1) + 1) % 6) * Math.PI / 3)));
                 rect.offset(x, y);
                 rectList.add(rect);
             }
@@ -90,7 +97,7 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
 
 
     private void generateRects(int itemCount) {
-        int floor = getFloorOfPosition(itemCount - 1);
+        int floor = getFloorByPosition(itemCount - 1);
         for (int i = 1; i <= floor; i++) {
             getFloorRectList(i - 1);
         }
@@ -144,6 +151,11 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
     }
 
 
+    /**
+     * 获得对应层的第一个索引
+     * @param floor
+     * @return
+     */
     public int getFloorStartPosition(int floor) {
         int pos = 0;
         for (int i = 0; i < floor; i++) {
@@ -153,24 +165,38 @@ public class HexagonLayoutManager extends RecyclerView.LayoutManager {
         return pos + 1;
     }
 
-    public int getFloorOfPosition(int position) {
-        if (position == 0) return 0;
+    /**
+     * 根据索引得到处于第几层
+     * @param  index 索引
+     * @return
+     */
+    public int getFloorByPosition(int index) {
+        if (index == 0) return 0;
         int floor = 0;
-        position -= 1;
+        index -= 1;
         do {
             floor++;
-            position -= getFloorCount(floor);
+            index -= getFloorCount(floor);
 
-        } while (position >= 0);
+        } while (index >= 0);
 
         return floor;
     }
 
+    /**
+     * 对应层六边形的个数
+     * @param floor
+     * @return
+     */
     public int getFloorCount(int floor) {
         if (floor == 0) return 1;
         return floor * 6;
     }
 
+    /**
+     * 最中间的，索引为0
+     * @param recycler
+     */
     private void initCenter(RecyclerView.Recycler recycler) {
         View view = recycler.getViewForPosition(0);
         //addView(view);
