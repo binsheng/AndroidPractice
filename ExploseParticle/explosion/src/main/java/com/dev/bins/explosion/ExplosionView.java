@@ -36,6 +36,7 @@ public class ExplosionView extends View {
 
     public ExplosionView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        attach2Activity((Activity) context);
     }
 
 
