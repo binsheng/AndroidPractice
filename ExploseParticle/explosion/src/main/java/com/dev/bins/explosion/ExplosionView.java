@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
-import com.dev.bins.explosion.factory.ExplodeFactory;
 import com.dev.bins.explosion.factory.Factory;
 
 import java.util.ArrayList;
@@ -51,7 +50,7 @@ public class ExplosionView extends View {
         if (rect.width() == 0 || rect.height() == 0) return;
 
         ValueAnimator valueAnimator = ValueAnimator.ofFloat(0, 1);
-        valueAnimator.setDuration(1000);
+        valueAnimator.setDuration(200);
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             Random random = new Random(System.currentTimeMillis());
 

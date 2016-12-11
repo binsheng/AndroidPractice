@@ -2,14 +2,20 @@ package com.dev.bins.explosion.partcle;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Rect;
+
+import java.util.Random;
 
 /**
  * Created by bin on 11/12/2016.
  */
 
-public class ExplodeParticle extends Particle {
-    public ExplodeParticle(int cx, int cy, int color) {
+public class FlyParticle extends Particle {
+    private Random random = new Random();
+    private Rect bounds;
+    public FlyParticle(float cx, float cy, int color, Rect bounds) {
         super(cx, cy, color);
+        this.bounds = bounds;
     }
 
     @Override
@@ -20,7 +26,7 @@ public class ExplodeParticle extends Particle {
 
     @Override
     public void calculate(float factor) {
-        cx = (int) (cx + factor+5);
-        cy = (int) (cy + factor+5);
+        cx = cx + factor * random.nextInt(bounds.width());
+        cy = cy - factor * random.nextInt(bounds.height()/2);
     }
 }

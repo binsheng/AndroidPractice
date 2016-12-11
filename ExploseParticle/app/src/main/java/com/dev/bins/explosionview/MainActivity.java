@@ -1,16 +1,12 @@
 package com.dev.bins.explosionview;
 
-import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageView;
 
 import com.dev.bins.explosion.ExplosionView;
-import com.dev.bins.explosion.Utils;
-import com.dev.bins.explosion.factory.ExplodeFactory;
-
-import static android.R.transition.explode;
+import com.dev.bins.explosion.factory.FlyFactory;
+import com.dev.bins.explosion.factory.FallingFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,9 +18,16 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.iv).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                explosionView.explode(view,new ExplodeFactory());
+                explosionView.explode(view,new FlyFactory());
             }
         });
+        findViewById(R.id.iv_sec).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                explosionView.explode(view,new FallingFactory());
+            }
+        });
+
 
 
     }

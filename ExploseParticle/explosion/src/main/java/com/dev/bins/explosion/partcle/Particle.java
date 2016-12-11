@@ -9,20 +9,20 @@ import android.graphics.Paint;
 
 public abstract class Particle {
 
-    protected int cx;
-    protected int cy;
+    protected float cx;
+    protected float cy;
     protected int color;
 
     public Particle() {
     }
 
-    public Particle(int cx, int cy, int color) {
+    public Particle(float cx, float cy, int color) {
         this.cx = cx;
         this.cy = cy;
         this.color = color;
     }
 
-    public int getCx() {
+    public float getCx() {
         return cx;
     }
 
@@ -30,7 +30,7 @@ public abstract class Particle {
         this.cx = cx;
     }
 
-    public int getCy() {
+    public float getCy() {
         return cy;
     }
 
