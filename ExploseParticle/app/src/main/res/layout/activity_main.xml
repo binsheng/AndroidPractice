@@ -10,8 +10,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.dev.bins.explosionview.MainActivity">
 
-    <TextView
+    <ImageView
+        android:id="@+id/iv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:src="@drawable/p5" />
 </RelativeLayout>
