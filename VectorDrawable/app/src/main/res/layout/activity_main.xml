@@ -34,14 +34,26 @@
             app:srcCompat="@drawable/arrow_anim" />
 
         <ImageView
-            android:onClick="anim"
             android:layout_width="100dp"
             android:layout_height="100dp"
+            android:onClick="anim"
             app:srcCompat="@drawable/square_anim" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:onClick="anim"
+            app:srcCompat="@drawable/search_anim" />
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:onClick="anim"
+            app:srcCompat="@drawable/path_anim" />
         <ImageView
             android:onClick="anim"
-            app:srcCompat="@drawable/search_anim"
-            android:layout_width="match_parent"
-            android:layout_height="50dp" />
+            app:srcCompat="@drawable/fivestar_anim"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
     </LinearLayout>
 </ScrollView>
