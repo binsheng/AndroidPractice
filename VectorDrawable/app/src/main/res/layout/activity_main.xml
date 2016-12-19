@@ -38,5 +38,10 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             app:srcCompat="@drawable/square_anim" />
+        <ImageView
+            android:onClick="anim"
+            app:srcCompat="@drawable/search_anim"
+            android:layout_width="match_parent"
+            android:layout_height="50dp" />
     </LinearLayout>
 </ScrollView>
