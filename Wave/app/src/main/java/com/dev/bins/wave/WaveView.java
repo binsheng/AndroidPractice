@@ -10,14 +10,9 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Xfermode;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-
-import static android.R.attr.offset;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 /**
  * Created by bin on 12/12/2016.
@@ -25,14 +20,15 @@ import static android.icu.lang.UCharacter.GraphemeClusterBreak.V;
 
 public class WaveView extends View {
     private Paint mPaint;
-    private Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+    private Paint mBitmapPaint;
+    private PorterDuffXfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
     private Canvas mCanvas;
     private Bitmap mBitmapDst;
     private Bitmap mBitmap;
     private Path mPath;
     private int height;
     private int width;
-    private int color = Color.YELLOW;
+    private int color = Color.RED;
     private ValueAnimator valueAnimator;
     private int offset = 0;
 
@@ -49,9 +45,13 @@ public class WaveView extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
+        mBitmapPaint = new Paint();
+        mBitmapPaint.setAntiAlias(true);
+        mBitmapPaint.setDither(true);
         mPath = new Path();
         mPaint.setColor(color);
-        mBitmapDst = BitmapFactory.decodeResource(getResources(), R.drawable.fire);
+        mPaint.setXfermode(xfermode);
+        mBitmapDst = BitmapFactory.decodeResource(getResources(), R.drawable.q1);
 
     }
 
@@ -68,15 +68,14 @@ public class WaveView extends View {
         height = h;
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-        valueAnimator = ValueAnimator.ofInt(0, 5);
+        valueAnimator = ValueAnimator.ofInt(-width/2, width/2);
         valueAnimator.setDuration(1000);
         valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        valueAnimator.setInterpolator(new LinearInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 offset = (int) valueAnimator.getAnimatedValue();
-                System.out.println(offset);
                 invalidate();
             }
         });
@@ -87,21 +86,21 @@ public class WaveView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mPaint.setFlags(LAYER_TYPE_SOFTWARE);
         mBitmap.eraseColor(Color.parseColor("#00000000"));
         mPath.reset();
+        int waveWith = width / 2;
         mPath.moveTo(0, height / 2);
-        int waveWith = width / 10;
-        for (int i = 0; i < 10; i++) {
-            int y = i % 2 == 0 ? height / 2 + 30 : height / 2 - 30;
-            mPath.quadTo(waveWith * i + waveWith / 2 - waveWith * offset, y, waveWith * (i + 1) - waveWith * offset, height / 2);
+        for (int i = 0; i < 2; i++) {
+            int y = i % 2 == 0 ? height / 2 + waveWith/5 : height / 2 - waveWith/5;
+            int x = (waveWith * (i + 1) - waveWith * i) / 2;
+            mPath.quadTo(waveWith * i + offset + x, y, waveWith * (i + 1) + offset, height / 2);
         }
         mPath.lineTo(width, height);
         mPath.lineTo(0, height);
         mPath.close();
-        mCanvas.drawBitmap(mBitmapDst, 0, 0, mPaint);
-        mPaint.setXfermode(xfermode);
+        mCanvas.drawBitmap(mBitmapDst, 0, 0, mBitmapPaint);
         mCanvas.drawPath(mPath, mPaint);
-        mPaint.setXfermode(null);
         canvas.drawBitmap(mBitmap, 0, 0, null);
 
     }
