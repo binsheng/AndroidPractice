@@ -15,6 +15,7 @@ import java.util.List;
 
 public class SuspendingDecoration extends RecyclerView.ItemDecoration {
     private List<CityBean> mDatas;
+    private int height = 50;
 
     public SuspendingDecoration(List<CityBean> mDatas) {
         this.mDatas = mDatas;
@@ -23,7 +24,14 @@ public class SuspendingDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        outRect.set(0, 0, 0, 20);
+        int pos = ((RecyclerView.LayoutParams) view.getLayoutParams()).getViewLayoutPosition();
+        if (pos == 0) {
+            outRect.set(0, height, 0, 0);
+        } else if (!mDatas.get(pos).getTag().equals(mDatas.get(pos - 1).getTag())) {
+            outRect.set(0, height, 0, 0);
+        } else {
+            outRect.set(0, 0, 0, 0);
+        }
     }
 
 
@@ -35,10 +43,24 @@ public class SuspendingDecoration extends RecyclerView.ItemDecoration {
         paint.setDither(true);
         paint.setStyle(Paint.Style.FILL);
         paint.setStrokeWidth(20);
-        paint.setColor(Color.BLACK);
+        paint.setColor(Color.GRAY);
+        Paint textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setDither(true);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setStrokeWidth(20);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(50);
         for (int i = 0; i < parent.getChildCount(); i++) {
             View childAt = parent.getChildAt(i);
-            c.drawRect(0, childAt.getBottom(), parent.getWidth(), childAt.getBottom() + 20,paint);
+            int pos = ((RecyclerView.LayoutParams)childAt.getLayoutParams()).getViewLayoutPosition();
+            if (i == 0) {
+                c.drawRect(0, childAt.getTop() - 50, parent.getWidth(), childAt.getTop(), paint);
+                c.drawText(mDatas.get(pos).getTag(), 10, childAt.getTop() - 20, textPaint);
+            } else if (!mDatas.get(pos).getTag().equals(mDatas.get(pos - 1).getTag())) {
+                c.drawRect(0, childAt.getTop() - 50, parent.getWidth(), childAt.getTop(), paint);
+                c.drawText(mDatas.get(pos).getTag(), 10, childAt.getTop() - 20, textPaint);
+            }
         }
 
     }

@@ -6,9 +6,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
 
     private List<CityBean> mDatas = new ArrayList<>();
     private RecyclerView mRv;
@@ -34,7 +37,12 @@ public class MainActivity extends AppCompatActivity {
             mDatas.add(cityBean);
         }
 
-
+        Collections.sort(mDatas, new Comparator<CityBean>() {
+            @Override
+            public int compare(CityBean lhs, CityBean rhs) {
+                return lhs.getTag().compareTo(rhs.getTag());
+            }
+        });
 
     }
 }
