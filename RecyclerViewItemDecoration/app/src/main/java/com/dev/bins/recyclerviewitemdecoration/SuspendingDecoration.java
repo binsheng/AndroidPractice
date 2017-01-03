@@ -77,15 +77,11 @@ public class SuspendingDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
         super.onDrawOver(c, parent, state);
-
-
         int pos = ((LinearLayoutManager) parent.getLayoutManager()).findFirstVisibleItemPosition();
         View view = parent.findViewHolderForLayoutPosition(pos).itemView;
         c.save();
         if (!mDatas.get(pos).getTag().equals(mDatas.get(pos + 1).getTag())) {
             if (view.getBottom() < height) {//view.getTop() + view.getHeight()和getbottom的效果是一样的
-                System.out.println(view.getTop());
-                System.out.println(view.getHeight());
                 c.translate(0, view.getTop() + view.getHeight() - height);
             }
         }
