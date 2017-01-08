@@ -46,7 +46,7 @@ public class SlidingMenu extends FrameLayout {
                     if (left < 0) left = 0;
                     if (left > mRange) left = (int) mRange;
                 }
-                
+
                 return left;
             }
 
@@ -127,7 +127,6 @@ public class SlidingMenu extends FrameLayout {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mViewDragHelper.processTouchEvent(event);
-
         return true;
     }
 
