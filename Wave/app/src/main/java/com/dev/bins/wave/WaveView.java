@@ -68,7 +68,7 @@ public class WaveView extends View {
         height = h;
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-        valueAnimator = ValueAnimator.ofInt(-width/2, width/2);
+        valueAnimator = ValueAnimator.ofInt(-width / 2, width / 2);
         valueAnimator.setDuration(1000);
         valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
         valueAnimator.setInterpolator(new LinearInterpolator());
@@ -86,18 +86,20 @@ public class WaveView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mPaint.setFlags(LAYER_TYPE_SOFTWARE);
+//        mPaint.setFlags(LAYER_TYPE_SOFTWARE);
         mBitmap.eraseColor(Color.parseColor("#00000000"));
         mPath.reset();
         int waveWith = width / 2;
         mPath.moveTo(0, height / 2);
         for (int i = 0; i < 2; i++) {
-            int y = i % 2 == 0 ? height / 2 + waveWith/5 : height / 2 - waveWith/5;
+            int y = i % 2 == 0 ? height / 2 + waveWith / 5 : height / 2 - waveWith / 5;
             int x = (waveWith * (i + 1) - waveWith * i) / 2;
             mPath.quadTo(waveWith * i + offset + x, y, waveWith * (i + 1) + offset, height / 2);
         }
+        mPath.lineTo(width, waveWith);
         mPath.lineTo(width, height);
         mPath.lineTo(0, height);
+        mPath.lineTo(0, waveWith);
         mPath.close();
         mCanvas.drawBitmap(mBitmapDst, 0, 0, mBitmapPaint);
         mCanvas.drawPath(mPath, mPaint);
