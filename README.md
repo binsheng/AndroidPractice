@@ -23,7 +23,7 @@
 
 3. TaiJi
 
-   ![Taiji](Taiji/screenshot.gif)
+   ![TaiJi](TaiJi/screenshot.gif)
 
 4. ExploseParticle
 
