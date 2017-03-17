@@ -23,8 +23,14 @@ import static android.R.attr.path;
 public class StickNessView extends View {
 
     private Paint mPaint;
+    /**
+     * 小球边上的两个点
+     */
     private PointF[] mStickCircle;
     private PointF[] mDragCircle;
+    /**
+     * 小球中心
+     */
     private PointF mStickCenter;
     private PointF mDragCenter;
     private float mRadius = 20f;
