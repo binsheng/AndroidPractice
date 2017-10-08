@@ -135,13 +135,15 @@ public class CalendarView extends LinearLayout {
                 convertView = inflater.inflate(R.layout.calendar_text_day, parent, false);
             }
 
-            int day = date.getDate();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
             ((TextView) convertView).setText(String.valueOf(day));
 
-            Date now = new Date();
+            Calendar now = Calendar.getInstance();
 
             boolean isTheSameMonth = false;
-            if (date.getMonth() == now.getMonth()){
+            if (calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH)){
                 isTheSameMonth = true;
             }
 
@@ -153,8 +155,8 @@ public class CalendarView extends LinearLayout {
             }
 
             //当天
-            if (now.getDate() == date.getDate() && date.getYear() == now.getYear()
-                    && date.getMonth() == now.getMonth()) {
+            if (now.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)&& calendar.get(Calendar.YEAR) == now.get(Calendar.YEAR)
+                    && calendar.get(Calendar.MONTH) == now.get(Calendar.MONTH)) {
                 ((TextView) convertView).setTextColor(Color.RED);
 
             }
