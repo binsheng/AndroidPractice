@@ -150,7 +150,6 @@ public class CalendarView extends LinearLayout {
                 ((TextView) convertView).setTextColor(Color.BLACK);
             } else {
                 ((TextView) convertView).setTextColor(Color.GRAY);
-
             }
 
             //当天
