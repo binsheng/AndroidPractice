@@ -55,7 +55,6 @@ public class RecycleViewCalendar extends LinearLayout {
         mRecyclerView.setAdapter(mAdapter);
         mGestureDetectorCompat = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
 
-
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
@@ -83,7 +82,7 @@ public class RecycleViewCalendar extends LinearLayout {
         return true;
     }
 
-    static class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder {
 
         TextView textView;
 
