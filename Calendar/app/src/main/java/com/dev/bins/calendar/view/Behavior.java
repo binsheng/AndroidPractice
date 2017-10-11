@@ -19,10 +19,12 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, RecyclerView child, int layoutDirection) {
-        parent.onLayoutChild(child, layoutDirection);
         RecycleViewCalendar calendarView = (RecycleViewCalendar) parent.getChildAt(0);
         int height = calendarView.getMeasuredHeight();
-        child.offsetTopAndBottom(height);
+        if (calendarView.getState() != RecycleViewCalendar.STATE_COLLAPSE) {
+            parent.onLayoutChild(child, layoutDirection);
+            child.offsetTopAndBottom(height);
+        }
         return true;
     }
 
@@ -36,23 +38,36 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target, int dx, int dy, int[] consumed) {
 //        System.out.println("onNestedPreScroll");
-        consumed[0] = 0;
-        consumed[1] = 100;
-        child.offsetTopAndBottom(-dy);
+
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
+        int top = child.getTop();
+        int height = calendarView.getMeasuredHeight();
+        if (top >= height && dy <0) {
+            consumed[0] = 0;
+            consumed[1] = 0;
+            child.offsetTopAndBottom(height - top);
+            calendarView.offsetTopAndBottom(-calendarView.getTop());
+            return;
+        }
+        if (top<=calendarView.getMinTop() && dy > 0){
+            consumed[0] = 0;
+            consumed[1] = 0;
+            return;
+        }
+        child.offsetTopAndBottom(-dy);
 //        calendarView.offsetTopAndBottom((int) (-dy*0.8));
         calendarView.onScroll(dy);
-        int height = calendarView.getMeasuredHeight();
-        int top = child.getTop();
-        if (top>height){
-            child.offsetTopAndBottom(height-top);
-        }
+
     }
 
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target) {
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
-        calendarView.open();
+        int top = child.getTop();
+        int height = calendarView.getMeasuredHeight();
+
+        calendarView.onStateChange(top>height/2);
+
     }
 
 

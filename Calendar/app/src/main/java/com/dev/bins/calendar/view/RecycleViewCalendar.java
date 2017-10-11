@@ -2,6 +2,7 @@ package com.dev.bins.calendar.view;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,12 +18,17 @@ import android.widget.TextView;
 
 import com.dev.bins.calendar.R;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TreeMap;
+
+import static com.dev.bins.calendar.view.RecycleViewCalendar.STATE_COLLAPSE;
+import static com.dev.bins.calendar.view.RecycleViewCalendar.STATE_OPEN;
 
 /**
  * Created by bin on 10/10/2017.
@@ -31,13 +37,15 @@ import java.util.TreeMap;
 public class RecycleViewCalendar extends LinearLayout {
 
 
+    public static final int STATE_OPEN = 1;
+    public static final int STATE_COLLAPSE = 2;
+    @STATE
+    int mCurrentState = STATE_OPEN;
     private Calendar mCalendar;
     private int mCurrentSelectionPosition = -1;
     private RecyclerView mRecyclerView;
-
     private GestureDetectorCompat mGestureDetectorCompat;
     private Adapter mAdapter;
-
     public RecycleViewCalendar(Context context) {
         this(context, null);
     }
@@ -83,35 +91,64 @@ public class RecycleViewCalendar extends LinearLayout {
         return true;
     }
 
+    public int getState() {
+        return mCurrentState;
+    }
 
-    public void onScroll(int dy){
+    public void onScroll(int dy) {
         View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
         int top = selctView.getTop();
 
-        if (-getTop()<top){
+        if (-getTop() < top) {
             offsetTopAndBottom(-dy);
-        }else{
-            offsetTopAndBottom(-top-getTop());
+        } else {
+            offsetTopAndBottom(-top - getTop());
         }
 
     }
 
+    public void collapse() {
+        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        int top = selctView.getTop();
+        offsetTopAndBottom(-top - getTop());
+        mCurrentState = STATE_COLLAPSE;
+    }
 
-    public void open(){
+    public void open() {
         int top = getTop();
         offsetTopAndBottom(-top);
+        mCurrentState = STATE_OPEN;
+    }
+
+    public void onStateChange(boolean isOpen) {
+        if (isOpen) {
+            open();
+        } else {
+            collapse();
+        }
+    }
+
+    public int getMinTop(){
+        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        int top = selctView.getTop();
+        return top;
     }
 
 
-    public int getCurrentPosition(){
+    public int getCurrentPosition() {
         return mCurrentSelectionPosition;
     }
 
 
+    @IntDef({STATE_OPEN, STATE_COLLAPSE})
+    @Retention(RetentionPolicy.SOURCE)
+    public @interface STATE {
+    }
 
     class Adapter extends RecyclerView.Adapter<Holder> {
 
         private List<Date> dates = new ArrayList<>();
+
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_text_day, parent, false);
@@ -162,11 +199,6 @@ public class RecycleViewCalendar extends LinearLayout {
             return dates.size();
         }
 
-
-
-
-
-
     }
 
 
@@ -179,8 +211,6 @@ public class RecycleViewCalendar extends LinearLayout {
             textView = itemView.findViewById(R.id.tv_calendar_day);
         }
     }
-
-
 
 
 }

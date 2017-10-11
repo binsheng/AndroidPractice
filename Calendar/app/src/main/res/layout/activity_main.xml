@@ -10,7 +10,6 @@
     <!--android:layout_width="match_parent"-->
     <!--android:layout_height="match_parent"></com.dev.bins.calendar.view.CalendarView>-->
 
-
     <com.dev.bins.calendar.view.RecycleViewCalendar
         android:layout_width="match_parent"
         android:id="@+id/calendar"
