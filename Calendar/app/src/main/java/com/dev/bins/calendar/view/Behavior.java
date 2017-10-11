@@ -1,17 +1,11 @@
 package com.dev.bins.calendar.view;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
-import android.util.JsonReader;
-import android.view.Choreographer;
 import android.view.View;
-import android.widget.LinearLayout;
 
 /**
  * Created by bin on 11/10/2017.
@@ -60,7 +54,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 //            calendarView.offsetTopAndBottom(-calendarView.getTop());
 //            return;
 //        }
-//        if (top<=calendarView.getMinTop() && dy > 0){
+//        if (top<=calendarView.getSelectViewTop() && dy > 0){
 //            consumed[0] = 0;
 //            consumed[1] = 0;
 //            return;
@@ -85,7 +79,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
         int top = child.getTop();
 
-        if (top <= mCalendarView.getMinTop()){
+        if (top <= mCalendarView.getSelectViewTop()){
 
             consumed[0] = 0;
             consumed[1] = 0;
@@ -93,7 +87,11 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
         }
 
         child.offsetTopAndBottom(-dy);
-        mCalendarView.onScroll(dy);
+        // CalendarView向上移动的距离小于当前选中的 view 的距离顶部的距离
+        if(-mCalendarView.getTop()<mCalendarView.getSelectViewTop()){
+            mCalendarView.offsetTopAndBottom(-dy);
+        }
+//        mCalendarView.onScroll(dy);
     }
 
 
@@ -134,7 +132,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
         }else {
             calendarView.collapse();
             // child 距离顶部的距离等于选中view的高度
-            child.offsetTopAndBottom(-(top - mCalendarView.getMinTop()));
+            child.offsetTopAndBottom(-(top - mCalendarView.getSelectViewTop()));
         }
 
 
