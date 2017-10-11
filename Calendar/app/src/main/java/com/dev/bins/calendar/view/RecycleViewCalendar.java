@@ -128,6 +128,7 @@ public class RecycleViewCalendar extends LinearLayout {
         }
     }
 
+    //当前选中 view 距离顶部的距离
     public int getMinTop(){
         View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
         int top = selctView.getTop();
