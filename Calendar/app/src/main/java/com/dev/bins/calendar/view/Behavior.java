@@ -29,18 +29,19 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View directTargetChild, View target, int nestedScrollAxes) {
-        System.out.println("onStartNestedScroll");
+//        System.out.println("onStartNestedScroll");
         return true;
     }
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target, int dx, int dy, int[] consumed) {
-        System.out.println("onNestedPreScroll");
+//        System.out.println("onNestedPreScroll");
         consumed[0] = 0;
         consumed[1] = 100;
         child.offsetTopAndBottom(-dy);
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
-        calendarView.offsetTopAndBottom((int) (-dy*0.8));
+//        calendarView.offsetTopAndBottom((int) (-dy*0.8));
+        calendarView.onScroll(dy);
         int height = calendarView.getMeasuredHeight();
         int top = child.getTop();
         if (top>height){

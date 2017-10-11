@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.dev.bins.calendar.R;
 
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,7 +32,7 @@ public class RecycleViewCalendar extends LinearLayout {
 
 
     private Calendar mCalendar;
-
+    private int mCurrentSelectionPosition = -1;
     private RecyclerView mRecyclerView;
 
     private GestureDetectorCompat mGestureDetectorCompat;
@@ -83,25 +84,34 @@ public class RecycleViewCalendar extends LinearLayout {
     }
 
 
+    public void onScroll(int dy){
+        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        int top = selctView.getTop();
+
+        if (-getTop()<top){
+            offsetTopAndBottom(-dy);
+        }else{
+            offsetTopAndBottom(-top-getTop());
+        }
+
+    }
+
+
     public void open(){
         int top = getTop();
         offsetTopAndBottom(-top);
     }
 
-    class Holder extends RecyclerView.ViewHolder {
 
-        TextView textView;
-
-        public Holder(View itemView) {
-            super(itemView);
-            textView = itemView.findViewById(R.id.tv_calendar_day);
-        }
+    public int getCurrentPosition(){
+        return mCurrentSelectionPosition;
     }
+
+
 
     class Adapter extends RecyclerView.Adapter<Holder> {
 
         private List<Date> dates = new ArrayList<>();
-
         @Override
         public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.calendar_text_day, parent, false);
@@ -124,6 +134,7 @@ public class RecycleViewCalendar extends LinearLayout {
 
             if (today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) && today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)) {
                 holder.textView.setTextColor(Color.RED);
+                mCurrentSelectionPosition = position;
             }
         }
 
@@ -159,7 +170,15 @@ public class RecycleViewCalendar extends LinearLayout {
     }
 
 
+    class Holder extends RecyclerView.ViewHolder {
 
+        TextView textView;
+
+        public Holder(View itemView) {
+            super(itemView);
+            textView = itemView.findViewById(R.id.tv_calendar_day);
+        }
+    }
 
 
 
