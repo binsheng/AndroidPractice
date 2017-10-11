@@ -19,7 +19,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, RecyclerView child, int layoutDirection) {
-        parent.onLayoutChild(child,layoutDirection);
+        parent.onLayoutChild(child, layoutDirection);
         RecycleViewCalendar calendarView = (RecycleViewCalendar) parent.getChildAt(0);
         int height = calendarView.getMeasuredHeight();
         child.offsetTopAndBottom(height);
@@ -39,14 +39,28 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
         consumed[0] = 0;
         consumed[1] = 100;
         child.offsetTopAndBottom(-dy);
+        RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
+        calendarView.offsetTopAndBottom((int) (-dy*0.8));
+        int height = calendarView.getMeasuredHeight();
+        int top = child.getTop();
+        if (top>height){
+            child.offsetTopAndBottom(height-top);
+        }
     }
 
     @Override
-    public void onNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
-        System.out.println("dyConsumed:"+dyConsumed);
-        System.out.println("dyUnconsumed:"+dyUnconsumed);
-        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+    public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target) {
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
-        calendarView.offsetTopAndBottom(-dyUnconsumed);
+        calendarView.open();
     }
+
+
+    //    @Override
+//    public void onNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed) {
+//        System.out.println("dyConsumed:"+dyConsumed);
+//        System.out.println("dyUnconsumed:"+dyUnconsumed);
+//        super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed);
+//        RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
+//        calendarView.offsetTopAndBottom(-dyUnconsumed);
+//    }
 }

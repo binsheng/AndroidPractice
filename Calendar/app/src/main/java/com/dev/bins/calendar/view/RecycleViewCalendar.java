@@ -82,6 +82,12 @@ public class RecycleViewCalendar extends LinearLayout {
         return true;
     }
 
+
+    public void open(){
+        int top = getTop();
+        offsetTopAndBottom(-top);
+    }
+
     class Holder extends RecyclerView.ViewHolder {
 
         TextView textView;
@@ -144,7 +150,18 @@ public class RecycleViewCalendar extends LinearLayout {
             }
             return dates.size();
         }
+
+
+
+
+
+
     }
+
+
+
+
+
 
 
 }
