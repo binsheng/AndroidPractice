@@ -73,9 +73,7 @@ public class RecycleViewCalendar extends LinearLayout {
                             mAdapter.nextMonth();
                             mAdapter.notifyDataSetChanged();
                             //setTop(getMeasuredHeight()-getMinTop());
-                            System.out.println(getTop()+":"+getMeasuredHeight());
-                            offsetTopAndBottom(-getMeasuredHeight());
-                            System.out.println(getTop()+":"+getMeasuredHeight());
+                            offsetTopAndBottom(getMinTop()-getMeasuredHeight());
                         } else {
                             mCalendar.add(Calendar.DAY_OF_MONTH, -7);
                             offsetTopAndBottom(getMinTop());
