@@ -67,7 +67,7 @@ public class RecycleViewCalendar extends LinearLayout {
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (Math.abs(e1.getX()-e2.getX())<Math.abs(e1.getY()-e2.getY())){
+                if (Math.abs(e1.getX() - e2.getX()) < Math.abs(e1.getY() - e2.getY())) {
                     return false;
                 }
 
@@ -75,12 +75,17 @@ public class RecycleViewCalendar extends LinearLayout {
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (getTop() >= 0) {
                             mCalendar.add(Calendar.DAY_OF_MONTH, -7);
+                            final boolean sameMonth = mAdapter.isPreviewSameMonth();
                             mAdapter.nextMonth();
                             mAdapter.notifyDataSetChanged();
                             post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    offsetTopAndBottom(getMinTop() - getMeasuredHeight());
+                                    if (sameMonth) {
+                                        offsetTopAndBottom(getMinTop() - getMeasuredHeight());
+                                    } else {
+                                        offsetTopAndBottom(2 * getMinTop() - getMeasuredHeight());
+                                    }
                                 }
                             });
                         } else {
@@ -96,14 +101,17 @@ public class RecycleViewCalendar extends LinearLayout {
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (-getTop() >= getMeasuredHeight() - getMinTop()) {
                             mCalendar.add(Calendar.DAY_OF_MONTH, 7);
+                            boolean nextSameMonth = mAdapter.isNextSameMonth();
                             mAdapter.nextMonth();
                             mAdapter.notifyDataSetChanged();
-//                            post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    offsetTopAndBottom(-getTop());
-//                                }
-//                            });
+                            if (!nextSameMonth) {
+                                post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        offsetTopAndBottom(-getMinTop());
+                                    }
+                                });
+                            }
                         } else {
                             mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                             offsetTopAndBottom(-getMinTop());
@@ -292,6 +300,30 @@ public class RecycleViewCalendar extends LinearLayout {
                 temp.add(Calendar.DAY_OF_MONTH, 1);
             }
         }
+
+
+        public boolean isPreviewSameMonth() {
+            Date first = dates.get(0);
+            Date last = dates.get(6);
+            Calendar firstCalendar = Calendar.getInstance();
+            firstCalendar.setTime(first);
+            Calendar lastCalendar = Calendar.getInstance();
+            lastCalendar.setTime(last);
+            return firstCalendar.get(Calendar.YEAR) == lastCalendar.get(Calendar.YEAR) && firstCalendar.get(Calendar.MONTH) == lastCalendar.get(Calendar.MONTH);
+        }
+
+
+        public boolean isNextSameMonth() {
+
+            Date first = dates.get(dates.size() - 7);
+            Date last = dates.get(dates.size() - 1);
+            Calendar firstCalendar = Calendar.getInstance();
+            firstCalendar.setTime(first);
+            Calendar lastCalendar = Calendar.getInstance();
+            lastCalendar.setTime(last);
+            return firstCalendar.get(Calendar.YEAR) == lastCalendar.get(Calendar.YEAR) && firstCalendar.get(Calendar.MONTH) == lastCalendar.get(Calendar.MONTH);
+        }
+
 
     }
 
