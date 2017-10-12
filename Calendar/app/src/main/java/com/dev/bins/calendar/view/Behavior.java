@@ -14,14 +14,11 @@ import android.view.View;
 public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
 
+    private RecycleViewCalendar mCalendarView;
+
     public Behavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
-
-    private RecycleViewCalendar mCalendarView;
-
-
-
 
     @Override
     public boolean onLayoutChild(CoordinatorLayout parent, RecyclerView child, int layoutDirection) {
@@ -64,61 +61,63 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 //        calendarView.onScroll(dy);
 
 
-        if (dy >0){
-            scrollUp(child,dy,consumed);
-        }else {
-            scrollDown(child,dy,consumed);
+        if (dy > 0) {
+            scrollUp(child, dy, consumed);
+        } else {
+            scrollDown(child, dy, consumed);
         }
 
     }
 
 
-
-    public void scrollUp(RecyclerView child, int dy, int[] consumed){
+    public void scrollUp(RecyclerView child, int dy, int[] consumed) {
 
 
         int top = child.getTop();
 
-        if (top <= mCalendarView.getSelectViewTop()){
+        if (top <= mCalendarView.getSelectViewTop()) {
 
             consumed[0] = 0;
             consumed[1] = 0;
             return;
         }
+        if (top - dy > mCalendarView.getMinTop()) {
+            child.offsetTopAndBottom(-dy);
+        } else {
+            child.offsetTopAndBottom(mCalendarView.getMinTop() - top);
+        }
 
-        child.offsetTopAndBottom(-dy);
-        // CalendarView向上移动的距离小于当前选中的 view 的距离顶部的距离
-        if(-mCalendarView.getTop()<mCalendarView.getSelectViewTop()){
+        // CalendarView向上移动的距离小于当前选中天的 view 的距离顶部的距离
+        if (-mCalendarView.getTop() < mCalendarView.getSelectViewTop()) {
             mCalendarView.offsetTopAndBottom(-dy);
         }
 //        mCalendarView.onScroll(dy);
     }
 
 
-    public void scrollDown(RecyclerView child, int dy, int[] consumed){
+    public void scrollDown(RecyclerView child, int dy, int[] consumed) {
 
-        LinearLayoutManager layoutManager= (LinearLayoutManager) child.getLayoutManager();
+        LinearLayoutManager layoutManager = (LinearLayoutManager) child.getLayoutManager();
         int firstVisiblePosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-        if (firstVisiblePosition != 0){
+        if (firstVisiblePosition != 0) {
             consumed[0] = 0;
             consumed[1] = 0;
             return;
         }
 
-        if (mCalendarView.getTop() < 0){
+        if (mCalendarView.getTop() < 0) {
             mCalendarView.offsetTopAndBottom(-dy);
             child.offsetTopAndBottom(-dy);
             return;
         }
 
         int top = child.getTop();
-        if (top<mCalendarView.getBottom()){
+        if (top < mCalendarView.getBottom()) {
             child.offsetTopAndBottom(-dy);
         }
 
 
     }
-
 
 
     @Override
@@ -126,13 +125,13 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
         int top = child.getTop();
         int height = calendarView.getMeasuredHeight();
-        if (top > height/2){
-            calendarView.open();
+        if (top > height / 2) {
+            calendarView.expand();
             child.offsetTopAndBottom(height - top);
-        }else {
+        } else {
             calendarView.collapse();
             // child 距离顶部的距离等于选中view的高度
-            child.offsetTopAndBottom(-(top - mCalendarView.getSelectViewTop()));
+            child.offsetTopAndBottom(mCalendarView.getMinTop()-top);
         }
 
 

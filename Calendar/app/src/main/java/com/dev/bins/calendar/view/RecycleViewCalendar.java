@@ -20,15 +20,10 @@ import com.dev.bins.calendar.R;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.TreeMap;
-
-import static com.dev.bins.calendar.view.RecycleViewCalendar.STATE_COLLAPSE;
-import static com.dev.bins.calendar.view.RecycleViewCalendar.STATE_OPEN;
 
 /**
  * Created by bin on 10/10/2017.
@@ -46,6 +41,7 @@ public class RecycleViewCalendar extends LinearLayout {
     private RecyclerView mRecyclerView;
     private GestureDetectorCompat mGestureDetectorCompat;
     private Adapter mAdapter;
+
     public RecycleViewCalendar(Context context) {
         this(context, null);
     }
@@ -72,6 +68,7 @@ public class RecycleViewCalendar extends LinearLayout {
                 } else {
                     mCalendar.add(Calendar.MONTH, 1);
                 }
+                mCurrentSelectionPosition = 0;
                 mAdapter.notifyDataSetChanged();
 
                 return super.onFling(e1, e2, velocityX, velocityY);
@@ -114,7 +111,7 @@ public class RecycleViewCalendar extends LinearLayout {
         mCurrentState = STATE_COLLAPSE;
     }
 
-    public void open() {
+    public void expand() {
         int top = getTop();
         offsetTopAndBottom(-top);
         mCurrentState = STATE_OPEN;
@@ -122,24 +119,32 @@ public class RecycleViewCalendar extends LinearLayout {
 
     public void onStateChange(boolean isOpen) {
         if (isOpen) {
-            open();
+            expand();
         } else {
             collapse();
         }
     }
 
     //当前选中 view 距离顶部的距离
-    public int getSelectViewTop(){
+    public int getSelectViewTop() {
         View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
         int top = selctView.getTop();
         return top;
     }
 
 
+    public int getMinTop() {
+        View view = mRecyclerView.getChildAt(0);
+        return view.getMeasuredHeight();
+    }
+
     public int getCurrentPosition() {
         return mCurrentSelectionPosition;
     }
 
+    private boolean isToday(Calendar calendar, Calendar today) {
+        return today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) && today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
+    }
 
     @IntDef({STATE_OPEN, STATE_COLLAPSE})
     @Retention(RetentionPolicy.SOURCE)
@@ -170,7 +175,7 @@ public class RecycleViewCalendar extends LinearLayout {
             }
             Calendar today = Calendar.getInstance();
 
-            if (today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) && today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH)) {
+            if (isToday(calendar, today)) {
                 holder.textView.setTextColor(Color.RED);
                 mCurrentSelectionPosition = position;
             }
@@ -201,7 +206,6 @@ public class RecycleViewCalendar extends LinearLayout {
         }
 
     }
-
 
     class Holder extends RecyclerView.ViewHolder {
 
