@@ -129,7 +129,9 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
             calendarView.expand();
             child.offsetTopAndBottom(height - top);
         } else {
-            calendarView.collapse();
+            if (calendarView.getState() != RecycleViewCalendar.STATE_COLLAPSE) {
+                calendarView.collapse();
+            }
             // child 距离顶部的距离等于选中view的高度
             child.offsetTopAndBottom(mCalendarView.getMinTop()-top);
         }

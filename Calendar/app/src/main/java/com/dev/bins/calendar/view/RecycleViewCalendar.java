@@ -6,13 +6,13 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -61,19 +61,25 @@ public class RecycleViewCalendar extends LinearLayout {
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mAdapter = new Adapter();
         mRecyclerView.setAdapter(mAdapter);
+        ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
+        final int touchSlop = viewConfiguration.getScaledTouchSlop();
         mGestureDetectorCompat = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 
-                if (e2.getX() - e1.getX() > 10) {//右滑
+                if (e2.getX() - e1.getX() > touchSlop) {//右滑
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (getTop() >= 0) {
                             mCalendar.add(Calendar.DAY_OF_MONTH, -7);
-                            mAdapter.nextMonth();
+                            mAdapter.prevCollapseMonth();
                             mAdapter.notifyDataSetChanged();
-                            //setTop(getMeasuredHeight()-getMinTop());
-                            offsetTopAndBottom(getMinTop()-getMeasuredHeight());
+                            post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    offsetTopAndBottom(getMinTop() - getMeasuredHeight());
+                                }
+                            });
                         } else {
                             mCalendar.add(Calendar.DAY_OF_MONTH, -7);
                             offsetTopAndBottom(getMinTop());
@@ -83,13 +89,18 @@ public class RecycleViewCalendar extends LinearLayout {
                         mAdapter.nextMonth();
                         mAdapter.notifyDataSetChanged();
                     }
-                } else {//左滑
+                } else if (e1.getX() - e2.getX() > touchSlop) {//左滑
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (-getTop() >= getMeasuredHeight() - getMinTop()) {
                             mCalendar.add(Calendar.MONTH, 1);
-                            mAdapter.nextMonth();
+                            mAdapter.nextCollapseMonth();
                             mAdapter.notifyDataSetChanged();
-                            offsetTopAndBottom(-getTop());
+                            post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    offsetTopAndBottom(-getTop());
+                                }
+                            });
                         } else {
                             mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                             offsetTopAndBottom(-getMinTop());
@@ -143,7 +154,6 @@ public class RecycleViewCalendar extends LinearLayout {
     }
 
     public void expand() {
-        mRecyclerView.setLayoutManager(mGridLayoutManager);
         int top = getTop();
         offsetTopAndBottom(-top);
         mCurrentState = STATE_OPEN;
@@ -203,7 +213,10 @@ public class RecycleViewCalendar extends LinearLayout {
             calendar.setTime(dates.get(position));
             Calendar current = mCalendar;
             holder.textView.setText(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
-
+            if (mCurrentState == STATE_COLLAPSE) {
+                holder.textView.setTextColor(Color.BLACK);
+                return;
+            }
             if (current.get(Calendar.MONTH) == calendar.get(Calendar.MONTH)) {
                 holder.textView.setTextColor(Color.BLACK);
             } else {
@@ -222,6 +235,42 @@ public class RecycleViewCalendar extends LinearLayout {
             return dates.size();
         }
 
+
+        private void nextWeek() {
+            List<Date> tempList = new ArrayList<>();
+            int row = mCurrentSelectionPosition / 7;
+            for (int i = 0; i < 7; i++) {
+                tempList.add(dates.get(row * 7 + i));
+            }
+            dates.clear();
+            dates.addAll(tempList);
+            notifyDataSetChanged();
+        }
+
+
+        private void prevCollapseMonth() {
+            Calendar temp = (Calendar) mCalendar.clone();
+            Date firstDay = dates.get(0);
+            temp.setTime(firstDay);
+            temp.add(Calendar.DAY_OF_MONTH, -4 * 7);
+            dates.clear();
+            for (int i = 0; i < 28; i++) {
+                dates.add(temp.getTime());
+                temp.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        }
+
+        private void nextCollapseMonth() {
+            Calendar temp = (Calendar) mCalendar.clone();
+            Date firstDay = dates.get(dates.size() - 1);
+            temp.setTime(firstDay);
+            temp.add(Calendar.DAY_OF_MONTH, 1);
+            dates.clear();
+            for (int i = 0; i < 28; i++) {
+                dates.add(temp.getTime());
+                temp.add(Calendar.DAY_OF_MONTH, 1);
+            }
+        }
 
         private void nextMonth() {
             dates.clear();
