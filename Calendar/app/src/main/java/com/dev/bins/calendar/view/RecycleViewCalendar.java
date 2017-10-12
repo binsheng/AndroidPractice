@@ -67,12 +67,15 @@ public class RecycleViewCalendar extends LinearLayout {
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (Math.abs(e1.getX()-e2.getX())<Math.abs(e1.getY()-e2.getY())){
+                    return false;
+                }
 
                 if (e2.getX() - e1.getX() > touchSlop) {//右滑
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (getTop() >= 0) {
                             mCalendar.add(Calendar.DAY_OF_MONTH, -7);
-                            mAdapter.prevCollapseMonth();
+                            mAdapter.nextMonth();
                             mAdapter.notifyDataSetChanged();
                             post(new Runnable() {
                                 @Override
@@ -92,15 +95,15 @@ public class RecycleViewCalendar extends LinearLayout {
                 } else if (e1.getX() - e2.getX() > touchSlop) {//左滑
                     if (mCurrentState == STATE_COLLAPSE) {
                         if (-getTop() >= getMeasuredHeight() - getMinTop()) {
-                            mCalendar.add(Calendar.MONTH, 1);
-                            mAdapter.nextCollapseMonth();
+                            mCalendar.add(Calendar.DAY_OF_MONTH, 7);
+                            mAdapter.nextMonth();
                             mAdapter.notifyDataSetChanged();
-                            post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    offsetTopAndBottom(-getTop());
-                                }
-                            });
+//                            post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    offsetTopAndBottom(-getTop());
+//                                }
+//                            });
                         } else {
                             mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                             offsetTopAndBottom(-getMinTop());
