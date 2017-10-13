@@ -83,6 +83,7 @@ public class RecycleViewCalendar extends LinearLayout {
 
     private void swipeLeft() {
         if (mCurrentState == STATE_COLLAPSE) {
+            //判断是否是最后一行
             if (-getTop() >= getMeasuredHeight() - getMinTop()) {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                 boolean nextSameMonth = mAdapter.isNextSameMonth();
@@ -93,9 +94,12 @@ public class RecycleViewCalendar extends LinearLayout {
                         @Override
                         public void run() {
                             offsetTopAndBottom(-getMinTop());
-                            mCurrentSelectionPosition = 0;
+                            mCurrentSelectionPosition = 7;
                         }
                     });
+                } else {
+                    mCurrentSelectionPosition = 0;
+
                 }
             } else {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
@@ -122,10 +126,10 @@ public class RecycleViewCalendar extends LinearLayout {
                     public void run() {
                         if (sameMonth) {
                             offsetTopAndBottom(getMinTop() - getMeasuredHeight());
-                            mCurrentSelectionPosition = mAdapter.getItemCount()-7;
+                            mCurrentSelectionPosition = mAdapter.getItemCount() - 7;
                         } else {
                             offsetTopAndBottom(2 * getMinTop() - getMeasuredHeight());
-                            mCurrentSelectionPosition = mAdapter.getItemCount()-14;
+                            mCurrentSelectionPosition = mAdapter.getItemCount() - 14;
                         }
                     }
                 });

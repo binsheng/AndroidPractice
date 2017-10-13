@@ -76,7 +76,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
         int top = child.getTop();
 
-        if (top <= mCalendarView.getMinTop()) {
+        if (top <= mCalendarView.getSelectViewTop()) {
 
             consumed[0] = 0;
             consumed[1] = 0;
