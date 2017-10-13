@@ -70,64 +70,76 @@ public class RecycleViewCalendar extends LinearLayout {
                 if (Math.abs(e1.getX() - e2.getX()) < Math.abs(e1.getY() - e2.getY())) {
                     return false;
                 }
-
                 if (e2.getX() - e1.getX() > touchSlop) {//右滑
-                    if (mCurrentState == STATE_COLLAPSE) {
-                        if (getTop() >= 0) {
-                            mCalendar.add(Calendar.DAY_OF_MONTH, -7);
-                            final boolean sameMonth = mAdapter.isPreviewSameMonth();
-                            mAdapter.nextMonth();
-                            mAdapter.notifyDataSetChanged();
-                            post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (sameMonth) {
-                                        offsetTopAndBottom(getMinTop() - getMeasuredHeight());
-                                    } else {
-                                        offsetTopAndBottom(2 * getMinTop() - getMeasuredHeight());
-                                    }
-                                }
-                            });
-                        } else {
-                            mCalendar.add(Calendar.DAY_OF_MONTH, -7);
-                            offsetTopAndBottom(getMinTop());
-                        }
-                    } else {
-                        mCalendar.add(Calendar.MONTH, -1);
-                        mAdapter.nextMonth();
-                        mAdapter.notifyDataSetChanged();
-                    }
+                    swipeRight();
                 } else if (e1.getX() - e2.getX() > touchSlop) {//左滑
-                    if (mCurrentState == STATE_COLLAPSE) {
-                        if (-getTop() >= getMeasuredHeight() - getMinTop()) {
-                            mCalendar.add(Calendar.DAY_OF_MONTH, 7);
-                            boolean nextSameMonth = mAdapter.isNextSameMonth();
-                            mAdapter.nextMonth();
-                            mAdapter.notifyDataSetChanged();
-                            if (!nextSameMonth) {
-                                post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        offsetTopAndBottom(-getMinTop());
-                                    }
-                                });
-                            }
-                        } else {
-                            mCalendar.add(Calendar.DAY_OF_MONTH, 7);
-                            offsetTopAndBottom(-getMinTop());
-                        }
-                    } else {
-                        mCalendar.add(Calendar.MONTH, 1);
-                        mAdapter.nextMonth();
-                        mAdapter.notifyDataSetChanged();
-                    }
+                    swipeLeft();
                 }
-                mCurrentSelectionPosition = 0;
-
                 return super.onFling(e1, e2, velocityX, velocityY);
             }
 
         });
+    }
+
+    private void swipeLeft() {
+        if (mCurrentState == STATE_COLLAPSE) {
+            if (-getTop() >= getMeasuredHeight() - getMinTop()) {
+                mCalendar.add(Calendar.DAY_OF_MONTH, 7);
+                boolean nextSameMonth = mAdapter.isNextSameMonth();
+                mAdapter.nextMonth();
+                mAdapter.notifyDataSetChanged();
+                if (!nextSameMonth) {
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            offsetTopAndBottom(-getMinTop());
+                            mCurrentSelectionPosition = 0;
+                        }
+                    });
+                }
+            } else {
+                mCalendar.add(Calendar.DAY_OF_MONTH, 7);
+                offsetTopAndBottom(-getMinTop());
+                mCurrentSelectionPosition += 7;
+            }
+        } else {
+            mCalendar.add(Calendar.MONTH, 1);
+            mAdapter.nextMonth();
+            mAdapter.notifyDataSetChanged();
+            mCurrentSelectionPosition = 0;
+        }
+    }
+
+    private void swipeRight() {
+        if (mCurrentState == STATE_COLLAPSE) {
+            if (getTop() >= 0) {
+                mCalendar.add(Calendar.DAY_OF_MONTH, -7);
+                final boolean sameMonth = mAdapter.isPreviewSameMonth();
+                mAdapter.nextMonth();
+                mAdapter.notifyDataSetChanged();
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (sameMonth) {
+                            offsetTopAndBottom(getMinTop() - getMeasuredHeight());
+                            mCurrentSelectionPosition = mAdapter.getItemCount()-7;
+                        } else {
+                            offsetTopAndBottom(2 * getMinTop() - getMeasuredHeight());
+                            mCurrentSelectionPosition = mAdapter.getItemCount()-14;
+                        }
+                    }
+                });
+            } else {
+                mCalendar.add(Calendar.DAY_OF_MONTH, -7);
+                offsetTopAndBottom(getMinTop());
+                mCurrentSelectionPosition -= 7;
+            }
+        } else {
+            mCalendar.add(Calendar.MONTH, -1);
+            mAdapter.nextMonth();
+            mAdapter.notifyDataSetChanged();
+            mCurrentSelectionPosition = 0;
+        }
     }
 
     @Override

@@ -35,12 +35,13 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View directTargetChild, View target, int nestedScrollAxes) {
+        System.out.println("onStartNestedScroll");
         return true;
     }
 
     @Override
     public void onNestedPreScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target, int dx, int dy, int[] consumed) {
-
+        System.out.println("onNestedPreScroll");
 //        RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
 //        int top = child.getTop();
 //        int height = calendarView.getMeasuredHeight();
@@ -75,7 +76,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
         int top = child.getTop();
 
-        if (top <= mCalendarView.getSelectViewTop()) {
+        if (top <= mCalendarView.getMinTop()) {
 
             consumed[0] = 0;
             consumed[1] = 0;
@@ -122,16 +123,20 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public void onStopNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View target) {
+        System.out.println("onStopNestedScroll");
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
         int top = child.getTop();
+        if (top == calendarView.getMinTop()){
+            return;
+        }
         int height = calendarView.getMeasuredHeight();
         if (top > height / 2) {
             calendarView.expand();
             child.offsetTopAndBottom(height - top);
         } else {
-                calendarView.collapse();
+            calendarView.collapse();
             // child 距离顶部的距离等于选中view的高度
-            child.offsetTopAndBottom(mCalendarView.getMinTop()-top);
+            child.offsetTopAndBottom(mCalendarView.getMinTop() - top);
         }
 
 
