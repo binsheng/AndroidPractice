@@ -76,7 +76,7 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
         int top = child.getTop();
 
-        if (top <= mCalendarView.getSelectViewTop()) {
+        if (top <= mCalendarView.getMinTop()) {
 
             consumed[0] = 0;
             consumed[1] = 0;
@@ -126,9 +126,9 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
         System.out.println("onStopNestedScroll");
         RecycleViewCalendar calendarView = (RecycleViewCalendar) coordinatorLayout.getChildAt(0);
         int top = child.getTop();
-        if (top == calendarView.getMinTop()){
-            return;
-        }
+//        if (top == calendarView.getMinTop()){
+//            return;
+//        }
         int height = calendarView.getMeasuredHeight();
         if (top > height / 2) {
             calendarView.expand();
