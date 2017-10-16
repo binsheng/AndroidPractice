@@ -35,7 +35,6 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View directTargetChild, View target, int nestedScrollAxes) {
-        System.out.println("onStartNestedScroll");
         return true;
     }
 
@@ -75,13 +74,14 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
 
         int top = child.getTop();
-
+        //滑动到最小高度
         if (top <= mCalendarView.getMinTop()) {
 
             consumed[0] = 0;
             consumed[1] = 0;
             return;
         }
+        // 是否会超过最小高度
         if (top - dy > mCalendarView.getMinTop()) {
             child.offsetTopAndBottom(-dy);
         } else {
@@ -95,7 +95,12 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 //        mCalendarView.onScroll(dy);
     }
 
-
+    /**
+     * 手指往下拖动
+     * @param child
+     * @param dy <0
+     * @param consumed
+     */
     public void scrollDown(RecyclerView child, int dy, int[] consumed) {
 
         LinearLayoutManager layoutManager = (LinearLayoutManager) child.getLayoutManager();
@@ -106,12 +111,14 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
             return;
         }
 
+        // 日历控件是否超出屏幕
         if (mCalendarView.getTop() < 0) {
             mCalendarView.offsetTopAndBottom(-dy);
             child.offsetTopAndBottom(-dy);
             return;
         }
 
+        // 有没有滚动到底部
         int top = child.getTop();
         if (top < mCalendarView.getBottom()) {
             child.offsetTopAndBottom(-dy);

@@ -70,7 +70,8 @@ public class RecycleViewCalendar extends LinearLayout {
                 if (Math.abs(e1.getX() - e2.getX()) < Math.abs(e1.getY() - e2.getY())) {
                     return false;
                 }
-                if (e2.getX() - e1.getX() > touchSlop) {//右滑
+                //右滑
+                if (e2.getX() - e1.getX() > touchSlop) {
                     swipeRight();
                 } else if (e1.getX() - e2.getX() > touchSlop) {//左滑
                     swipeLeft();
@@ -82,8 +83,9 @@ public class RecycleViewCalendar extends LinearLayout {
     }
 
     private void swipeLeft() {
+        //是否是折叠
         if (mCurrentState == STATE_COLLAPSE) {
-            //判断是否是最后一行
+            //判断当前显示的是否是最后一行
             if (-getTop() >= getMeasuredHeight() - getMinTop()) {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                 boolean nextSameMonth = mAdapter.isNextSameMonth();
@@ -99,7 +101,6 @@ public class RecycleViewCalendar extends LinearLayout {
                     });
                 } else {
                     mCurrentSelectionPosition = 0;
-
                 }
             } else {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
@@ -318,6 +319,7 @@ public class RecycleViewCalendar extends LinearLayout {
         }
 
 
+        // 判断首行是不是同一个月
         public boolean isPreviewSameMonth() {
             Date first = dates.get(0);
             Date last = dates.get(6);
@@ -329,6 +331,7 @@ public class RecycleViewCalendar extends LinearLayout {
         }
 
 
+        //最后一行是不是同一个月
         public boolean isNextSameMonth() {
 
             Date first = dates.get(dates.size() - 7);
