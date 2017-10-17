@@ -35,7 +35,8 @@ public class Behavior extends CoordinatorLayout.Behavior<RecyclerView> {
 
     @Override
     public boolean onStartNestedScroll(CoordinatorLayout coordinatorLayout, RecyclerView child, View directTargetChild, View target, int nestedScrollAxes) {
-        return true;
+        //判断滚动的 view 是不是 Behavior 的view
+        return directTargetChild == child;
     }
 
     @Override
