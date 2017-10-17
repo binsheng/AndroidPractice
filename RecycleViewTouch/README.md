@@ -1,0 +1,3 @@
+# RecycleViewTouch
+
+![screenshot](./screenshot.gif)

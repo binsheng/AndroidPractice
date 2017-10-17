@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import java.util.List;
  * Created by bin on 10/10/2017.
  */
 
-public class RecycleViewCalendar extends LinearLayout {
+public class RecycleViewCalendar extends LinearLayout implements RecyclerView.OnItemTouchListener {
 
 
     public static final int STATE_OPEN = 1;
@@ -61,6 +62,8 @@ public class RecycleViewCalendar extends LinearLayout {
         mRecyclerView.setLayoutManager(mGridLayoutManager);
         mAdapter = new Adapter();
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnItemTouchListener(this);
+
         ViewConfiguration viewConfiguration = ViewConfiguration.get(context);
         final int touchSlop = viewConfiguration.getScaledTouchSlop();
         mGestureDetectorCompat = new GestureDetectorCompat(context, new GestureDetector.SimpleOnGestureListener() {
@@ -214,6 +217,21 @@ public class RecycleViewCalendar extends LinearLayout {
 
     private boolean isToday(Calendar calendar, Calendar today) {
         return today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) && today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
     }
 
     @IntDef({STATE_OPEN, STATE_COLLAPSE})
