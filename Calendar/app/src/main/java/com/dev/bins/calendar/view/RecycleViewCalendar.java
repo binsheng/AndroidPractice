@@ -44,10 +44,12 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
     private GestureDetectorCompat mGestureDetectorCompat;
     private Adapter mAdapter;
     private GridLayoutManager mGridLayoutManager;
+    private OnItemClickListener onItemClickListener;
 
     public RecycleViewCalendar(Context context) {
         this(context, null);
     }
+
 
     public RecycleViewCalendar(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
@@ -79,7 +81,21 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
                 } else if (e1.getX() - e2.getX() > touchSlop) {//左滑
                     swipeLeft();
                 }
-                return super.onFling(e1, e2, velocityX, velocityY);
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                float x = e.getX();
+                float y = e.getY();
+                View childView = mRecyclerView.findChildViewUnder(x, y);
+                int position = mRecyclerView.getChildLayoutPosition(childView);
+                mCurrentSelectionPosition = position;
+                if (null != onItemClickListener) {
+                    onItemClickListener.onItemClick(position,mAdapter.getDate(position));
+                    return true;
+                }
+                return super.onSingleTapUp(e);
             }
 
         });
@@ -150,16 +166,11 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
         }
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return true;
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetectorCompat.onTouchEvent(event);
-        return true;
-    }
+
 
     public int getState() {
         return mCurrentState;
@@ -219,14 +230,26 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
         return today.get(Calendar.MONTH) == calendar.get(Calendar.MONTH) && today.get(Calendar.YEAR) == calendar.get(Calendar.YEAR) && today.get(Calendar.DAY_OF_MONTH) == calendar.get(Calendar.DAY_OF_MONTH);
     }
 
+
     @Override
-    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
         return false;
     }
 
     @Override
-    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+    public boolean onTouchEvent(MotionEvent event) {
+        return mGestureDetectorCompat.onTouchEvent(event);
+    }
 
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        return mGestureDetectorCompat.onTouchEvent(e);
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+        mGestureDetectorCompat.onTouchEvent(e);
     }
 
     @Override
@@ -237,6 +260,13 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
     @IntDef({STATE_OPEN, STATE_COLLAPSE})
     @Retention(RetentionPolicy.SOURCE)
     public @interface STATE {
+    }
+
+    public interface OnItemClickListener {
+
+        public void onItemClick(int position,Date date);
+
+
     }
 
     class Adapter extends RecyclerView.Adapter<Holder> {
@@ -281,6 +311,13 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
             return dates.size();
         }
 
+
+        public Date getDate(int position) {
+            if (position>=0 && position<dates.size()){
+                return dates.get(position);
+            }
+            return null;
+        }
 
         private void nextWeek() {
             List<Date> tempList = new ArrayList<>();
