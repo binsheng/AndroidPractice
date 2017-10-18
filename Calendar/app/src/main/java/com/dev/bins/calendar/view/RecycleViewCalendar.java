@@ -231,10 +231,6 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
     }
 
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return false;
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -249,7 +245,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
     @Override
     public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-        mGestureDetectorCompat.onTouchEvent(e);
+//        mGestureDetectorCompat.onTouchEvent(e);
     }
 
     @Override
