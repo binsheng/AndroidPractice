@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -27,6 +26,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.dev.bins.calendar.view.CalendarAdapter.STATE_COLLAPSE;
+import static com.dev.bins.calendar.view.CalendarAdapter.STATE_OPEN;
+
 /**
  * Created by bin on 10/10/2017.
  */
@@ -34,15 +36,11 @@ import java.util.List;
 public class RecycleViewCalendar extends LinearLayout implements RecyclerView.OnItemTouchListener {
 
 
-    public static final int STATE_OPEN = 1;
-    public static final int STATE_COLLAPSE = 2;
-    @STATE
-    int mCurrentState = STATE_OPEN;
+
     private Calendar mCalendar;
-    private int mCurrentSelectionPosition = -1;
     private RecyclerView mRecyclerView;
     private GestureDetectorCompat mGestureDetectorCompat;
-    private Adapter mAdapter;
+    private CalendarAdapter mAdapter;
     private GridLayoutManager mGridLayoutManager;
     private OnItemClickListener onItemClickListener;
 
@@ -62,7 +60,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
         mRecyclerView = findViewById(R.id.recyclerview);
         mGridLayoutManager = new GridLayoutManager(context, 7);
         mRecyclerView.setLayoutManager(mGridLayoutManager);
-        mAdapter = new Adapter();
+        mAdapter = new CalendarAdapter(mCalendar);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnItemTouchListener(this);
 
@@ -90,7 +88,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
                 float y = e.getY();
                 View childView = mRecyclerView.findChildViewUnder(x, y);
                 int position = mRecyclerView.getChildLayoutPosition(childView);
-                mCurrentSelectionPosition = position;
+                mAdapter.setCurrentSelectionPosition(position);
                 if (null != onItemClickListener) {
                     onItemClickListener.onItemClick(position,mAdapter.getDate(position));
                     return true;
@@ -103,7 +101,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
     private void swipeLeft() {
         //是否是折叠
-        if (mCurrentState == STATE_COLLAPSE) {
+        if (mAdapter.getCurrentState() == STATE_COLLAPSE) {
             //判断当前显示的是否是最后一行
             if (-getTop() >= getMeasuredHeight() - getMinTop()) {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
@@ -115,27 +113,27 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
                         @Override
                         public void run() {
                             offsetTopAndBottom(-getMinTop());
-                            mCurrentSelectionPosition = 7;
+                            mAdapter.setCurrentSelectionPosition(7);
                         }
                     });
                 } else {
-                    mCurrentSelectionPosition = 0;
+                    mAdapter.setCurrentSelectionPosition(0);
                 }
             } else {
                 mCalendar.add(Calendar.DAY_OF_MONTH, 7);
                 offsetTopAndBottom(-getMinTop());
-                mCurrentSelectionPosition += 7;
+                mAdapter.setCurrentSelectionPosition(mAdapter.getCurrentSelectionPosition()+7);
             }
         } else {
             mCalendar.add(Calendar.MONTH, 1);
             mAdapter.nextMonth();
             mAdapter.notifyDataSetChanged();
-            mCurrentSelectionPosition = 0;
+            mAdapter.setCurrentSelectionPosition(0);
         }
     }
 
     private void swipeRight() {
-        if (mCurrentState == STATE_COLLAPSE) {
+        if (mAdapter.getCurrentState() == STATE_COLLAPSE) {
             if (getTop() >= 0) {
                 mCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 final boolean sameMonth = mAdapter.isPreviewSameMonth();
@@ -146,23 +144,23 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
                     public void run() {
                         if (sameMonth) {
                             offsetTopAndBottom(getMinTop() - getMeasuredHeight());
-                            mCurrentSelectionPosition = mAdapter.getItemCount() - 7;
+                            mAdapter.setCurrentSelectionPosition( mAdapter.getItemCount() - 7);
                         } else {
                             offsetTopAndBottom(2 * getMinTop() - getMeasuredHeight());
-                            mCurrentSelectionPosition = mAdapter.getItemCount() - 14;
+                            mAdapter.setCurrentSelectionPosition( mAdapter.getItemCount() - 14);
                         }
                     }
                 });
             } else {
                 mCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 offsetTopAndBottom(getMinTop());
-                mCurrentSelectionPosition -= 7;
+                mAdapter.setCurrentSelectionPosition(mAdapter.getCurrentSelectionPosition()-1);
             }
         } else {
             mCalendar.add(Calendar.MONTH, -1);
             mAdapter.nextMonth();
             mAdapter.notifyDataSetChanged();
-            mCurrentSelectionPosition = 0;
+            mAdapter.setCurrentSelectionPosition(0);
         }
     }
 
@@ -173,11 +171,11 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
 
     public int getState() {
-        return mCurrentState;
+        return mAdapter.getCurrentState();
     }
 
     public void onScroll(int dy) {
-        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        View selctView = mRecyclerView.getChildAt(mAdapter.getCurrentSelectionPosition());
         int top = selctView.getTop();
 
         if (-getTop() < top) {
@@ -189,16 +187,16 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
     }
 
     public void collapse() {
-        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        View selctView = mRecyclerView.getChildAt(mAdapter.getCurrentSelectionPosition());
         int top = selctView.getTop();
         offsetTopAndBottom(-top - getTop());
-        mCurrentState = STATE_COLLAPSE;
+        mAdapter.setCurrentState(STATE_COLLAPSE);
     }
 
     public void expand() {
         int top = getTop();
         offsetTopAndBottom(-top);
-        mCurrentState = STATE_OPEN;
+        mAdapter.setCurrentState(STATE_OPEN);
     }
 
     public void onStateChange(boolean isOpen) {
@@ -211,7 +209,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
     //当前选中 view 距离顶部的距离
     public int getSelectViewTop() {
-        View selctView = mRecyclerView.getChildAt(mCurrentSelectionPosition);
+        View selctView = mRecyclerView.getChildAt(mAdapter.getCurrentSelectionPosition());
         int top = selctView.getTop();
         return top;
     }
@@ -223,7 +221,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
     }
 
     public int getCurrentPosition() {
-        return mCurrentSelectionPosition;
+        return mAdapter.getCurrentSelectionPosition();
     }
 
     private boolean isToday(Calendar calendar, Calendar today) {
@@ -285,7 +283,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
             calendar.setTime(dates.get(position));
             Calendar current = mCalendar;
             holder.textView.setText(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)));
-            if (mCurrentState == STATE_COLLAPSE) {
+            if (mAdapter.getCurrentState() == STATE_COLLAPSE) {
                 holder.textView.setTextColor(Color.BLACK);
                 return;
             }
@@ -298,7 +296,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
             if (isToday(calendar, today)) {
                 holder.textView.setTextColor(Color.RED);
-                mCurrentSelectionPosition = position;
+                mAdapter.setCurrentSelectionPosition(position);
             }
         }
 
@@ -317,7 +315,7 @@ public class RecycleViewCalendar extends LinearLayout implements RecyclerView.On
 
         private void nextWeek() {
             List<Date> tempList = new ArrayList<>();
-            int row = mCurrentSelectionPosition / 7;
+            int row = mAdapter.getCurrentSelectionPosition() / 7;
             for (int i = 0; i < 7; i++) {
                 tempList.add(dates.get(row * 7 + i));
             }
